@@ -5,7 +5,7 @@ require 'twitter'
 require './keys'
 require './tweet_creator.rb'
 
-class TweeterClient
+class TwitterClient
   def initialize
     @client = Twitter::REST::Client.new do |config|
       config.consumer_key        = YOUR_CONSUMER_KEY
@@ -20,10 +20,11 @@ class TweeterClient
   rescue StandardError => e
     p e
   end
+  p "posted"
 end
 
 # random_tweetを実行する
 if $PROGRAM_NAME == __FILE__
   tweet = pickone
-  TweeterClient.new.post(tweet)
+  TwitterClient.new.post(tweet)
 end
