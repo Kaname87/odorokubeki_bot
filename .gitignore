@@ -8,8 +8,8 @@ vendor/
 tmp/
 extracted/
 
-# Api Keys
-keys.rb
+# Envrionmental Variables
+.env
 
 # Editor Config
 .vscode/
