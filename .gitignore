@@ -2,5 +2,7 @@
 extracted/
 WikiExtractor.py
 *.txt
+*.xml
 
+vendor/
 *.bk
