@@ -7,6 +7,7 @@ GEM
     buftok (0.2.0)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
+    dotenv (2.6.0)
     equalizer (0.0.11)
     http (3.3.0)
       addressable (~> 2.3)
@@ -62,6 +63,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dotenv
   nokogiri (= 1.10.0)
   rubocop
   twitter (= 6.2.0)
