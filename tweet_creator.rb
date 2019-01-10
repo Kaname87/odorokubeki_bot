@@ -1,24 +1,24 @@
 require "csv"
 require "./const"
 
-def extract_sentence(content) 
+def extract_sentence(content, max_sentence_length)
     # 文で区切るパターン
-    sentence_by_period = extract_sentence_by_period(content)
-    if (sentence_by_period.length <= MAX_SENTENCE_LENGTH)
+    sentence_by_period = extract_sentence_by_period(content, max_sentence_length)
+    if (sentence_by_period.length <= max_sentence_length)
         return sentence_by_period
     end
-    
+
     # 括弧で区切るパターン
-    sentence_by_parentheses = extract_sentence_by_parenthese(content)
-    if (sentence_by_parentheses.length <= MAX_SENTENCE_LENGTH)
+    sentence_by_parentheses = extract_sentence_by_parenthese(content, max_sentence_length)
+    if (sentence_by_parentheses.length <= max_sentence_length)
         return sentence_by_parentheses
     end
 
     # どちらも長すぎたら、長さで
-    return extract_sentence_by_length(content)
+    return extract_sentence_by_length(content, max_sentence_length)
 end
 
-def extract_sentence_by_period(content)
+def extract_sentence_by_period(content, max_sentence_length)
     keyword_idx = content.index(KEY_WORD)
     # keyword前と後に分割
     first_part = content[0...keyword_idx]
@@ -50,7 +50,7 @@ end
 def sentence()
 end
 
-def extract_sentence_by_parenthese(content)
+def extract_sentence_by_parenthese(content, max_sentence_length)
     keyword_idx = content.index(KEY_WORD)
     # keyword前と後に分割
     first_part = content[0...keyword_idx]
@@ -77,11 +77,11 @@ def extract_sentence_by_parenthese(content)
     return first_part_sentence + last_part_sentence
 end
 
-def extract_sentence_by_length(content)
+def extract_sentence_by_length(content, max_sentence_length)
     keyword_idx = content.index(KEY_WORD)
     ellipsis = '...'
 
-    end_idx = keyword_idx + MAX_SENTENCE_LENGTH - ellipsis.length
+    end_idx = keyword_idx + max_sentence_length - ellipsis.length
     return content[keyword_idx...end_idx] + ellipsis
 end
 
@@ -89,21 +89,25 @@ def outout()
 end
 
 def create_tweet_text(row)
-    sentence = extract_sentence(row[CONTENT_IDX])
-     
-    text = <<-EOS
+    max_sentence_length = calc_max_sentence_length(row)
+    sentence = extract_sentence(row[CONTENT_IDX], max_sentence_length)
+
+    text = <<-TWEET
 #{sentence}
 
 - #{row[TITLE_IDX]}
 #{URL_BASE}#{row[ID_IDX]}
-    EOS
-    
+    TWEET
+
     return text
 end
 
+def calc_max_sentence_length(row)
+    MAX_TWEET_LENGTH - (row[TITLE_IDX].length + row[ID_IDX].length + URL_BASE.length)
+end
 
 tweet_texts = []
-CSV.foreach(ARTICLES_FILE_NAME).drop(1).each do |row|    
+CSV.foreach(KEYWORD_ARTICLES_CSV_NAME).drop(1).each do |row|
     tweet_texts << create_tweet_text(row)
 end
 
