@@ -20,5 +20,5 @@ class TwitterClient
   rescue StandardError => e
     p e
   end
-  p "posted"
+  p 'posted'
 end
