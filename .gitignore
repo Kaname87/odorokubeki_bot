@@ -2,3 +2,5 @@
 extracted/
 WikiExtractor.py
 *.txt
+
+*.bk
