@@ -122,11 +122,9 @@ def rondom_select_row
     return rows[target_idx]
 end
 
-def tweet
+def pickone
     tartget_row = rondom_select_row
     tweet_text = create_tweet_text(tartget_row)
-    # call api
 end
 
-tweet()
 
