@@ -103,15 +103,30 @@ def create_tweet_text(row)
     return text
 end
 
-def output_to_file(tweet_texts)
+def output_to_file()
+    tweet_texts = []
+    CSV.foreach(KEYWORD_ARTICLES_CSV_NAME).drop(1).each do |row|
+        tweet_texts << create_tweet_text(row)
+    end
     File.open('text.txt', 'w') do |f|
         f.puts(tweet_texts.join("\n"))
     end
 end
 
-tweet_texts = []
-CSV.foreach(KEYWORD_ARTICLES_CSV_NAME).drop(1).each do |row|
-    tweet_texts << create_tweet_text(row)
+def rondom_select_row
+    rows = CSV.foreach(KEYWORD_ARTICLES_CSV_NAME).drop(1)
+    last_idx = (rows.length) -1
+    
+    target_idx = Random.rand(0..last_idx)
+    
+    return rows[target_idx]
 end
 
-output_to_file(tweet_texts)
+def tweet
+    tartget_row = rondom_select_row
+    tweet_text = create_tweet_text(tartget_row)
+    # call api
+end
+
+tweet()
+
