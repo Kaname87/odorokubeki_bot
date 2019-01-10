@@ -1,6 +1,10 @@
 require "csv"
 require "./const"
 
+def calc_max_sentence_length(row)
+    MAX_TWEET_LENGTH - (row[TITLE_IDX].length + row[ID_IDX].length + URL_BASE.length)
+end
+
 def extract_sentence(content, max_sentence_length)
     # 文で区切るパターン
     sentence_by_period = extract_sentence_by_period(content, max_sentence_length)
@@ -85,9 +89,6 @@ def extract_sentence_by_length(content, max_sentence_length)
     return content[keyword_idx...end_idx] + ellipsis
 end
 
-def outout()
-end
-
 def create_tweet_text(row)
     max_sentence_length = calc_max_sentence_length(row)
     sentence = extract_sentence(row[CONTENT_IDX], max_sentence_length)
@@ -102,8 +103,10 @@ def create_tweet_text(row)
     return text
 end
 
-def calc_max_sentence_length(row)
-    MAX_TWEET_LENGTH - (row[TITLE_IDX].length + row[ID_IDX].length + URL_BASE.length)
+def output_to_file(tweet_texts)
+    File.open('text.txt', 'w') do |f|
+        f.puts(tweet_texts.join("\n"))
+    end
 end
 
 tweet_texts = []
@@ -111,6 +114,4 @@ CSV.foreach(KEYWORD_ARTICLES_CSV_NAME).drop(1).each do |row|
     tweet_texts << create_tweet_text(row)
 end
 
-File.open('text.txt', 'w') do |f|
-    f.puts(tweet_texts.join("\n"))
-end
+output_to_file(tweet_texts)
