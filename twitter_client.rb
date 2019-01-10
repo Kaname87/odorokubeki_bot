@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'twitter'
 
 require './keys'
@@ -13,17 +15,15 @@ class TweeterClient
     end
   end
 
-  def post(text) 
-      begin
-        @client.update(text)
-      rescue => e
-        p e
-      end
+  def post(text)
+    @client.update(text)
+  rescue StandardError => e
+    p e
   end
 end
 
 # random_tweetを実行する
-if __FILE__ == $0
-    tweet = pickone()
-    TweeterClient.new.post(tweet)
+if $PROGRAM_NAME == __FILE__
+  tweet = pickone
+  TweeterClient.new.post(tweet)
 end
