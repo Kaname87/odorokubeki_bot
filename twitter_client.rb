@@ -22,9 +22,3 @@ class TwitterClient
   end
   p "posted"
 end
-
-# random_tweetを実行する
-if $PROGRAM_NAME == __FILE__
-  tweet = pickone
-  TwitterClient.new.post(tweet)
-end
