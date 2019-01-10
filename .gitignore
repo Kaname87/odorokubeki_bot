@@ -1,8 +1,14 @@
 *.bz2
-extracted/
-WikiExtractor.py
 *.txt
 *.xml
 
+# Vendor or sources  
 vendor/
-*.bk
+tmp/
+extracted/
+
+# Api Keys
+keys.rb
+
+# Editor Config
+.vscode/
