@@ -1,45 +1,34 @@
 require "csv"
-
-def extract_url(article)
-    matched = /url="[\S]+/.match(article)
-    url = matched[0].gsub!("url=\"", "").gsub!('"', '')
-end
-
-def extract_title(article)
-    matched = /title=".+">/.match(article)
-    title = matched[0].gsub!("title=\"", "").gsub!('">', '')
-end
-
-def extract_content(article, search_word)
-    word_index = article.index(search_word)
-    start_sub = [word_index - 30, 0].max
-    end_sub = start_sub + 100
-    content = "..." + article[start_sub..end_sub] + "..."
-end
-
+require 'nokogiri'
+require "./const"
 
 def read_and_extract(filename, search_word)
     results = []
-    contents = File.read(filename)
+    # CSV出力用に改行削除
+    articles = File.read(filename).gsub(/[\r\n]/,"")
+
+    # wikipediaの出力ファイルには複数のXML エレメント(doc エレメント)が並列して書かれており、全てをネストするルートエレメントが不在
+    # この場合Nokogiriは一番先頭のXMLエレメントとその子供しかパースしてくれないので、
+    # ルートエレメントを追加して、全体をvalidなXMLにする
+    xml = "<root>#{articles}</root>"
     
-    articles = contents.split("</doc>")
-    articles.each do |article|
-        if (article.index(search_word) != nil)
-            article.delete!("\n")
-            
+    docs = Nokogiri::XML(xml).xpath('//doc')
+    docs.each do |doc|
+        if (doc.text.include?(search_word))
             result = []
-            result << extract_url(article)
-            result << extract_title(article)
-            result << extract_content(article, search_word)
-            
+            result << doc.attr('id')
+            result << doc.attr('title')
+            result << doc.text
+    
             results << result
-        end 
+        end
     end
-    results
+    return results
 end
 
-def write_csv(filename, results)
-    CSV.open(filename, 'a') do |csv| # Add to existing text
+
+def append_to_csv(filename, results)
+    CSV.open(filename, 'a') do |csv| # 追記
         results.each do |result|
             csv << result
         end 
@@ -48,24 +37,29 @@ end
 
 def init_output_file(filename)
     CSV.open(filename, 'w') do |csv|
-        csv << ['url', 'title', 'content']
+        csv << ['id', 'title', 'content']
     end
 end
 
-search_word = "驚くべきことに"
-result_filename = 'result.csv'
+# ヘッダーのみ先に出力
+init_output_file(ARTICLES_FILE_NAME)
 
-init_output_file(result_filename)
-
+# ディレクトリを走査し、ファイルの内容からキーワードにマッチするものを全て出力
 Dir.glob("./extracted/*")  do |dir| 
     p "**********"
     p dir
     p "**********"
     Dir.glob("#{dir}/*") do |filename|
+
         p filename
-        results = read_and_extract(filename, search_word)
+
+        results = read_and_extract(filename, KEY_WORD)
         if (results.count > 0) 
-            write_csv(result_filename, results)
+            append_to_csv(ARTICLES_FILE_NAME, results)
         end
     end
 end
+
+p "DONE"
+count = CSV.foreach(result_filename, headers: true).count
+p "Number of records: #{count}"
