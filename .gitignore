@@ -3,6 +3,7 @@
 *.xml
 
 # Vendor or sources  
+.bundle/
 vendor/
 tmp/
 extracted/
